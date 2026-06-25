@@ -42,7 +42,7 @@ export default function LoginScreen() {
           <MilkIcon size={40} color={colors.white} strokeWidth={2} />
         </View>
         <View className="items-center gap-2">
-          <Txt variant="h1">Welcome back</Txt>
+          <Txt variant="h1" accessibilityRole="header">Welcome back</Txt>
           <Txt variant="bodyLg" className="text-center text-ink-muted">
             Enter your mobile number to receive a one-time code.
           </Txt>

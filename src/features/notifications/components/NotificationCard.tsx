@@ -23,6 +23,8 @@ export function NotificationCard({ notification, onPress }: NotificationCardProp
   const unread = !notification.read;
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${unread ? "Unread. " : ""}${notification.title}. ${notification.body}`}
       onPress={onPress}
       className={cn(
         "flex-row gap-3 rounded-card border p-4 active:opacity-90",

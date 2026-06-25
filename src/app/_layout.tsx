@@ -22,29 +22,49 @@ import { shadow } from "@/lib/theme";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
+// Native phones below this width are an exact passthrough (layout unchanged);
+// at/above it we treat the device as a tablet and cap the content column.
+const TABLET_BREAKPOINT = 768;
+
 /**
- * Frames the mobile app as a centered phone-width column on web so it doesn't
- * stretch edge-to-edge on large screens. On native this is a passthrough.
+ * Frames the mobile app so it never stretches edge-to-edge on large screens:
+ * on web as a centered phone-width column, on native tablets (iPad) as a
+ * centered, width-capped reading column. Native phones pass through unchanged.
  */
 function ResponsiveFrame({ children }: { children: React.ReactNode }) {
-  // Hooks must run unconditionally; only the web branch uses the dimensions.
-  const { height } = useWindowDimensions();
-  if (Platform.OS !== "web") return <>{children}</>;
-  // Pin to the exact window height and clip overflow so the bottom tab bar
-  // always lands inside the viewport instead of falling below the fold.
-  return (
-    <View
-      className="items-center bg-surface-muted"
-      style={{ height, overflow: "hidden" }}
-    >
+  // Hooks must run unconditionally; the branches below read these dimensions.
+  const { width, height } = useWindowDimensions();
+
+  if (Platform.OS === "web") {
+    // Pin to the exact window height and clip overflow so the bottom tab bar
+    // always lands inside the viewport instead of falling below the fold.
+    return (
       <View
-        className="flex-1 w-full max-w-[440px] bg-surface-muted"
-        style={shadow.elevated}
+        className="items-center bg-surface-muted"
+        style={{ height, overflow: "hidden" }}
       >
-        {children}
+        <View
+          className="flex-1 w-full max-w-[440px] bg-surface-muted"
+          style={shadow.elevated}
+        >
+          {children}
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
+
+  // Native tablets/large screens: center a comfortable column so cards don't
+  // span the full ~1024px width. Height flexes (native handles safe areas).
+  if (width >= TABLET_BREAKPOINT) {
+    return (
+      <View className="flex-1 items-center bg-surface-muted">
+        <View className="w-full max-w-[600px] flex-1 bg-surface-muted">{children}</View>
+      </View>
+    );
+  }
+
+  // Native phones: unchanged.
+  return <>{children}</>;
 }
 
 export default function RootLayout() {
