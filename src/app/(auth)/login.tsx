@@ -6,6 +6,8 @@ import { ScreenContainer } from "@/components/ScreenContainer";
 import { Txt } from "@/components/ui/Text";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { colors, shadow } from "@/lib/theme";
 import { phoneSchema } from "@/features/auth/schemas";
 import { useRequestOtp } from "@/features/auth/hooks";
 import { normalizeError } from "@/core/api/errors";
@@ -31,16 +33,23 @@ export default function LoginScreen() {
   };
 
   return (
-    <ScreenContainer scroll className="gap-6 bg-surface">
-      <View className="items-center gap-3 pt-12">
-        <MilkIcon size={56} color="#1565C0" />
-        <Txt variant="h1">Welcome</Txt>
-        <Txt variant="muted" className="text-center">
-          Enter your mobile number to receive a one-time code.
-        </Txt>
+    <ScreenContainer scroll className="gap-8 bg-surface-muted">
+      <View className="items-center gap-4 pt-16">
+        <View
+          className="h-20 w-20 items-center justify-center rounded-3xl bg-accent"
+          style={shadow.elevated}
+        >
+          <MilkIcon size={40} color={colors.white} strokeWidth={2} />
+        </View>
+        <View className="items-center gap-2">
+          <Txt variant="h1">Welcome back</Txt>
+          <Txt variant="bodyLg" className="text-center text-ink-muted">
+            Enter your mobile number to receive a one-time code.
+          </Txt>
+        </View>
       </View>
 
-      <View className="gap-4">
+      <Card className="gap-5" variant="elevated">
         <Input
           label="Mobile number"
           prefix="+91"
@@ -59,7 +68,11 @@ export default function LoginScreen() {
           loading={requestOtp.isPending}
           disabled={phone.length !== 10}
         />
-      </View>
+      </Card>
+
+      <Txt variant="caption" className="text-center">
+        By continuing you agree to our Terms & Privacy Policy.
+      </Txt>
     </ScreenContainer>
   );
 }

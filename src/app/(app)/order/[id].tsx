@@ -25,12 +25,12 @@ export default function OrderDetailScreen() {
       ) : (
         <ScrollView contentContainerClassName="p-4 gap-4">
           <Card className="gap-1">
-            <Txt variant="muted">Delivery date</Txt>
-            <Txt variant="title">{formatDate(order.data.deliveryDate)}</Txt>
+            <Txt variant="overline">Delivery date</Txt>
+            <Txt variant="h3">{formatDate(order.data.deliveryDate)}</Txt>
           </Card>
           <Card>
-            <Txt variant="title" className="mb-1">
-              Items
+            <Txt variant="overline" className="mb-1">
+              Items · {order.data.items.length}
             </Txt>
             {order.data.items.map((line) => (
               <OrderLineRow key={line.productId} line={line} />

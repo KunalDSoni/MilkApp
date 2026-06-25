@@ -2,6 +2,7 @@ import { Pressable, View } from "react-native";
 import { Minus, Plus } from "lucide-react-native";
 import { Txt } from "./ui/Text";
 import { cn } from "@/lib/cn";
+import { colors } from "@/lib/theme";
 
 interface QuantityStepperProps {
   value: number;
@@ -33,18 +34,18 @@ export function QuantityStepper({
   return (
     <View
       className={cn(
-        "h-12 flex-row items-center overflow-hidden rounded-xl border border-brand-light bg-surface",
+        "h-12 flex-row items-center overflow-hidden rounded-2xl border border-border bg-surface-muted",
         disabled && "opacity-50",
       )}
     >
       <StepButton onPress={dec} disabled={disabled || atMin}>
-        <Minus size={20} color="#0D47A1" />
+        <Minus size={18} color={atMin ? colors.textSubtle : colors.accent} strokeWidth={2.5} />
       </StepButton>
-      <View className="min-w-12 items-center justify-center px-3">
-        <Txt variant="title">{value}</Txt>
+      <View className="min-w-11 items-center justify-center px-2">
+        <Txt variant="num" className="text-base">{value}</Txt>
       </View>
       <StepButton onPress={inc} disabled={disabled || atMax}>
-        <Plus size={20} color="#0D47A1" />
+        <Plus size={18} color={atMax ? colors.textSubtle : colors.accent} strokeWidth={2.5} />
       </StepButton>
     </View>
   );
@@ -65,7 +66,7 @@ function StepButton({
       disabled={disabled}
       onPress={onPress}
       className={cn(
-        "h-12 w-12 items-center justify-center bg-brand-light active:bg-brand-light/60",
+        "h-12 w-12 items-center justify-center bg-surface active:bg-accent-soft",
         disabled && "opacity-40",
       )}
     >

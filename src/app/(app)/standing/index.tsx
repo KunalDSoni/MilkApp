@@ -9,6 +9,7 @@ import { LoadingState } from "@/components/LoadingState";
 import { ErrorState } from "@/components/ErrorState";
 import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/Button";
+import { colors } from "@/lib/theme";
 import { normalizeError } from "@/core/api/errors";
 
 export default function StandingOrdersScreen() {
@@ -46,10 +47,10 @@ export default function StandingOrdersScreen() {
         />
       )}
 
-      <View className="border-t border-surface-muted bg-surface p-4">
+      <View className="border-t border-border bg-surface p-4">
         <Button
           label="Create Standing Order"
-          icon={<Plus size={20} color="#fff" />}
+          icon={<Plus size={20} color={colors.white} strokeWidth={2.5} />}
           onPress={() => router.push("/(app)/standing/edit")}
         />
       </View>

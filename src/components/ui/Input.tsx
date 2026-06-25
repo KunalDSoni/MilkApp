@@ -1,7 +1,8 @@
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { TextInput, TextInputProps, View } from "react-native";
 import { Txt } from "./Text";
 import { cn } from "@/lib/cn";
+import { colors } from "@/lib/theme";
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -11,23 +12,46 @@ interface InputProps extends TextInputProps {
 }
 
 export const Input = forwardRef<TextInput, InputProps>(function Input(
-  { label, error, prefix, className, ...rest },
+  { label, error, prefix, className, onFocus, onBlur, ...rest },
   ref,
 ) {
+  const [focused, setFocused] = useState(false);
+
   return (
-    <View className="gap-1.5">
-      {label ? <Txt variant="label">{label}</Txt> : null}
+    <View className="gap-2">
+      {label ? (
+        <Txt variant="overline" className="text-ink-muted">
+          {label}
+        </Txt>
+      ) : null}
       <View
         className={cn(
           "h-14 flex-row items-center rounded-2xl border bg-surface px-4",
-          error ? "border-danger" : "border-surface-muted",
+          error
+            ? "border-danger bg-danger-soft"
+            : focused
+              ? "border-accent bg-accent-soft"
+              : "border-border bg-surface-muted",
         )}
       >
-        {prefix ? <Txt variant="muted" className="mr-1">{prefix}</Txt> : null}
+        {prefix ? (
+          <Txt variant="body" className="mr-1.5 text-ink-muted">
+            {prefix}
+          </Txt>
+        ) : null}
         <TextInput
           ref={ref}
-          placeholderTextColor="#9CA3AF"
-          className={cn("flex-1 text-lg text-ink", className)}
+          placeholderTextColor={colors.textSubtle}
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
+          className={cn("flex-1 text-ink", className)}
+          style={{ fontFamily: "Inter_500Medium", fontSize: 16 }}
           {...rest}
         />
       </View>

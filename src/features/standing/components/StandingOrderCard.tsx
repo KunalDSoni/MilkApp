@@ -3,7 +3,8 @@ import { CalendarDays, Pencil } from "lucide-react-native";
 import { Card } from "@/components/ui/Card";
 import { Txt } from "@/components/ui/Text";
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/cn";
+import { Badge } from "@/components/ui/Badge";
+import { colors } from "@/lib/theme";
 import { formatMask } from "@/lib/constants";
 import { StandingOrder } from "../schemas";
 
@@ -18,26 +19,14 @@ export function StandingOrderCard({ standingOrder, onEdit }: StandingOrderCardPr
     <Card className="gap-3">
       <View className="flex-row items-center justify-between">
         <Txt variant="title">{standingOrder.name ?? "Standing order"}</Txt>
-        <View
-          className={cn(
-            "rounded-full px-3 py-1",
-            standingOrder.active ? "bg-success/15" : "bg-ink-subtle/20",
-          )}
-        >
-          <Txt
-            variant="caption"
-            className={cn(
-              "font-semibold",
-              standingOrder.active ? "text-success" : "text-ink-muted",
-            )}
-          >
-            {standingOrder.active ? "Active" : "Paused"}
-          </Txt>
-        </View>
+        <Badge
+          label={standingOrder.active ? "Active" : "Paused"}
+          tone={standingOrder.active ? "success" : "neutral"}
+        />
       </View>
 
       <View className="flex-row items-center gap-2">
-        <CalendarDays size={16} color="#6B7280" />
+        <CalendarDays size={16} color={colors.textSecondary} />
         <Txt variant="muted">{formatMask(standingOrder.weekdayMask)}</Txt>
       </View>
 
@@ -52,7 +41,7 @@ export function StandingOrderCard({ standingOrder, onEdit }: StandingOrderCardPr
         label="Edit"
         variant="secondary"
         size="md"
-        icon={<Pencil size={18} color="#0D47A1" />}
+        icon={<Pencil size={18} color={colors.accent} />}
         onPress={onEdit}
       />
     </Card>

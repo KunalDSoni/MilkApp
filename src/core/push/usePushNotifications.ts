@@ -47,6 +47,9 @@ export function usePushNotifications() {
   useEffect(() => {
     let mounted = true;
 
+    // expo-notifications device push is not supported on web; skip setup there.
+    if (Platform.OS === "web") return;
+
     (async () => {
       if (!Device.isDevice && !env.useMocks) return;
 
