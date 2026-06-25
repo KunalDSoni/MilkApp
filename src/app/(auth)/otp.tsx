@@ -66,34 +66,48 @@ export default function OtpScreen() {
   };
 
   return (
-    <ScreenContainer scroll className="gap-8 bg-surface">
-      <View className="gap-2 pt-12">
+    <ScreenContainer scroll className="gap-8 bg-surface-muted">
+      <View className="gap-3 pt-14">
         <Txt variant="h1">Verify number</Txt>
-        <Txt variant="muted">
-          Enter the 6-digit code sent to +91 {phone}.
+        <Txt variant="bodyLg" className="text-ink-muted">
+          Enter the 6-digit code sent to{"\n"}
+          <Txt variant="bodyLg" className="text-ink" style={{ fontFamily: "Inter_600SemiBold" }}>
+            +91 {phone}
+          </Txt>
         </Txt>
         {env.useMocks ? (
-          <Txt variant="caption" className="text-warning">
-            Mock mode: use code 123456
-          </Txt>
+          <View className="self-start rounded-full bg-warning-soft px-3 py-1.5">
+            <Txt variant="caption" className="text-warning">
+              Mock mode — use code 123456
+            </Txt>
+          </View>
         ) : null}
       </View>
 
       {/* Hidden input drives visible boxes for minimal-typing UX. */}
       <Pressable onPress={() => inputRef.current?.focus()}>
-        <View className="flex-row justify-between">
-          {Array.from({ length: OTP_LENGTH }).map((_, i) => (
-            <View
-              key={i}
-              className={cn(
-                "h-14 w-12 items-center justify-center rounded-xl border-2 bg-surface",
-                otp.length === i ? "border-brand" : "border-surface-muted",
-                error && "border-danger",
-              )}
-            >
-              <Txt variant="h2">{otp[i] ?? ""}</Txt>
-            </View>
-          ))}
+        <View className="flex-row justify-between gap-2">
+          {Array.from({ length: OTP_LENGTH }).map((_, i) => {
+            const active = otp.length === i;
+            const filled = otp[i] != null;
+            return (
+              <View
+                key={i}
+                className={cn(
+                  "h-16 flex-1 items-center justify-center rounded-2xl border-2",
+                  error
+                    ? "border-danger bg-danger-soft"
+                    : active
+                      ? "border-accent bg-accent-soft"
+                      : filled
+                        ? "border-border bg-surface"
+                        : "border-border bg-surface-muted",
+                )}
+              >
+                <Txt variant="h2">{otp[i] ?? ""}</Txt>
+              </View>
+            );
+          })}
         </View>
         <TextInput
           ref={inputRef}
@@ -121,8 +135,11 @@ export default function OtpScreen() {
         disabled={otp.length !== OTP_LENGTH}
       />
 
-      <Pressable onPress={onResend} disabled={secondsLeft > 0}>
-        <Txt variant={secondsLeft > 0 ? "muted" : "label"} className="text-center">
+      <Pressable onPress={onResend} disabled={secondsLeft > 0} className="py-1">
+        <Txt
+          variant="label"
+          className={cn("text-center", secondsLeft > 0 ? "text-ink-subtle" : "text-accent")}
+        >
           {secondsLeft > 0 ? `Resend code in ${secondsLeft}s` : "Resend code"}
         </Txt>
       </Pressable>

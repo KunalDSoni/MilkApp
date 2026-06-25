@@ -10,9 +10,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import * as SecureStore from "expo-secure-store";
 import { useQueryClient } from "@tanstack/react-query";
-import { clearTokens, loadTokens, saveTokens } from "./session";
+import { clearTokens, loadTokens, saveTokens, storage } from "./session";
 import { setSessionExpiredHandler } from "@/core/api/client";
 import { logout as logoutApi } from "@/features/auth/api";
 import { User, VerifyResult, userSchema } from "@/features/auth/schemas";
@@ -38,7 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(async () => {
     await logoutApi();
     await clearTokens();
-    await SecureStore.deleteItemAsync(USER_KEY);
+    await storage.deleteItem(USER_KEY);
     queryClient.clear();
     setUser(null);
     setStatus("unauthenticated");
@@ -49,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       accessToken: result.accessToken,
       refreshToken: result.refreshToken,
     });
-    await SecureStore.setItemAsync(USER_KEY, JSON.stringify(result.user));
+    await storage.setItem(USER_KEY, JSON.stringify(result.user));
     setUser(result.user);
     setStatus("authenticated");
   }, []);
@@ -64,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setStatus("unauthenticated");
         return;
       }
-      const raw = await SecureStore.getItemAsync(USER_KEY);
+      const raw = await storage.getItem(USER_KEY);
       const parsed = raw ? userSchema.safeParse(JSON.parse(raw)) : null;
       if (parsed?.success) setUser(parsed.data);
       setStatus("authenticated");

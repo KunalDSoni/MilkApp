@@ -19,10 +19,10 @@ export function OrderSummaryCard({ order }: { order: Order }) {
       <Row label="Total quantity" value={`${totalQty}`} />
       <Row label="Subtotal" value={formatCurrency(order.subtotal)} />
       <Row label="Tax" value={formatCurrency(order.taxTotal)} />
-      <View className="h-px bg-surface-muted" />
+      <View className="h-px bg-border" />
       <View className="flex-row items-center justify-between">
         <Txt variant="title">Total</Txt>
-        <Txt variant="h2" className="text-brand-dark">
+        <Txt variant="numXl" className="text-accent-dark">
           {formatCurrency(order.total)}
         </Txt>
       </View>
@@ -34,7 +34,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row items-center justify-between">
       <Txt variant="muted">{label}</Txt>
-      <Txt variant="label">{value}</Txt>
+      <Txt variant="num">{value}</Txt>
     </View>
   );
 }

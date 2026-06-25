@@ -1,4 +1,5 @@
-import { Alert, ScrollView, View } from "react-native";
+import { useState } from "react";
+import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useRouter } from "expo-router";
 import { ShoppingBasket } from "lucide-react-native";
@@ -9,6 +10,7 @@ import { CutoffBanner } from "@/features/orders/components/CutoffBanner";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Txt } from "@/components/ui/Text";
+import { Banner } from "@/components/Banner";
 import { QuantityStepper } from "@/components/QuantityStepper";
 import { EmptyState } from "@/components/EmptyState";
 import { productUnitLabel } from "@/features/products/schemas";
@@ -21,6 +23,7 @@ export default function CartReviewScreen() {
   const products = useProducts();
   const window = useCurrentWindow();
   const placeOrder = usePlaceOrder();
+  const [placeError, setPlaceError] = useState<string | null>(null);
 
   const quantities = useCart((s) => s.quantities);
   const setQty = useCart((s) => s.setQty);
@@ -31,16 +34,21 @@ export default function CartReviewScreen() {
 
   const onPlace = () => {
     if (!window.data) return;
+    setPlaceError(null);
     placeOrder.mutate(
       { orderWindowId: window.data.id, lines },
       {
         onSuccess: () => {
           clear();
-          Alert.alert("Order placed", "Your order has been submitted.", [
-            { text: "OK", onPress: () => router.replace("/(app)/(tabs)/orders") },
-          ]);
+          // Navigate straight to history with a flag so it shows a success
+          // banner there. (RN Alert is a no-op on web, so we can't gate the
+          // navigation behind an alert callback.)
+          router.replace({
+            pathname: "/(app)/(tabs)/orders",
+            params: { placed: "1" },
+          });
         },
-        onError: (err) => Alert.alert("Could not place order", normalizeError(err).message),
+        onError: (err) => setPlaceError(normalizeError(err).message),
       },
     );
   };
@@ -66,7 +74,7 @@ export default function CartReviewScreen() {
             {window.data ? (
               <CutoffBanner cutoffAt={window.data.cutoffAt} status={window.data.status} />
             ) : window.isError ? (
-              <Card className="bg-warning/10">
+              <Card className="border-warning/20 bg-warning-soft">
                 <Txt variant="label" className="text-warning">
                   Ordering window unavailable
                 </Txt>
@@ -75,15 +83,15 @@ export default function CartReviewScreen() {
             ) : null}
 
             <Card>
-              <Txt variant="title" className="mb-1">
-                Items
+              <Txt variant="overline" className="mb-1">
+                Items · {lines.length}
               </Txt>
               {lines.map((line) => {
                 const product = productById(line.productId);
                 return (
                   <View
                     key={line.productId}
-                    className="flex-row items-center justify-between gap-3 border-b border-surface-muted py-3"
+                    className="flex-row items-center justify-between gap-3 border-b border-border py-3.5"
                   >
                     <View className="flex-1">
                       <Txt variant="label">{product?.name ?? line.productId}</Txt>
@@ -114,7 +122,15 @@ export default function CartReviewScreen() {
             </Txt>
           </ScrollView>
 
-          <View className="border-t border-surface-muted bg-surface p-4">
+          <View className="border-t border-border bg-surface p-4">
+            {placeError ? (
+              <Banner
+                tone="error"
+                message={placeError}
+                onDismiss={() => setPlaceError(null)}
+                className="mb-3"
+              />
+            ) : null}
             {!online ? (
               <Txt variant="caption" className="mb-2 text-center text-danger">
                 Connect to the internet to place your order.

@@ -22,6 +22,7 @@ import { LoadingState } from "@/components/LoadingState";
 import { productUnitLabel } from "@/features/products/schemas";
 import { FULL_WEEK_MASK, WEEKDAYS, maskHasDay, toggleMaskDay } from "@/lib/constants";
 import { cn } from "@/lib/cn";
+import { colors } from "@/lib/theme";
 import { normalizeError } from "@/core/api/errors";
 
 export default function StandingEditScreen() {
@@ -108,7 +109,7 @@ export default function StandingEditScreen() {
           />
 
           <View className="gap-2">
-            <Txt variant="label">Repeat on</Txt>
+            <Txt variant="overline">Repeat on</Txt>
             <View className="flex-row flex-wrap gap-2">
               {WEEKDAYS.map((d) => {
                 const selected = maskHasDay(weekdayMask, d.bit);
@@ -121,11 +122,11 @@ export default function StandingEditScreen() {
                       })
                     }
                     className={cn(
-                      "h-11 min-w-12 items-center justify-center rounded-xl border px-3",
-                      selected ? "border-brand bg-brand-light" : "border-surface-muted bg-surface",
+                      "h-11 min-w-12 items-center justify-center rounded-2xl border px-3 active:opacity-80",
+                      selected ? "border-accent bg-accent" : "border-border bg-surface",
                     )}
                   >
-                    <Txt variant="label" className={selected ? "text-brand-dark" : "text-ink-muted"}>
+                    <Txt variant="label" className={selected ? "text-white" : "text-ink-muted"}>
                       {d.short}
                     </Txt>
                   </Pressable>
@@ -152,13 +153,13 @@ export default function StandingEditScreen() {
         </Card>
 
         <Card className="gap-1">
-          <Txt variant="title" className="mb-2">
+          <Txt variant="overline" className="mb-2">
             Products
           </Txt>
           {products.data?.map((p) => (
             <View
               key={p.id}
-              className="flex-row items-center justify-between border-b border-surface-muted py-2"
+              className="flex-row items-center justify-between gap-3 border-b border-border py-3"
             >
               <View className="flex-1">
                 <Txt variant="label">{p.name}</Txt>
@@ -178,14 +179,14 @@ export default function StandingEditScreen() {
           <Button
             label="Delete"
             variant="danger"
-            icon={<Trash2 size={18} color="#fff" />}
+            icon={<Trash2 size={18} color={colors.white} />}
             loading={deleteMut.isPending}
             onPress={onDelete}
           />
         ) : null}
       </ScrollView>
 
-      <View className="border-t border-surface-muted bg-surface p-4">
+      <View className="border-t border-border bg-surface p-4">
         <Button
           label={id ? "Save changes" : "Create"}
           loading={submitting}

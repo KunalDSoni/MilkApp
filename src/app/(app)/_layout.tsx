@@ -4,6 +4,15 @@ import { useAuth } from "@/core/auth/useAuth";
 import { LoadingState } from "@/components/LoadingState";
 import { OfflineBanner } from "@/components/OfflineBanner";
 import { usePushNotifications } from "@/core/push/usePushNotifications";
+import { colors } from "@/lib/theme";
+
+// Premium, consistent native header across all stack screens.
+const headerOptions = {
+  headerShadowVisible: false,
+  headerStyle: { backgroundColor: colors.card },
+  headerTintColor: colors.accent,
+  headerTitleStyle: { fontFamily: "Inter_700Bold", fontSize: 17, color: colors.text },
+} as const;
 
 export default function AppLayout() {
   const { status } = useAuth();
@@ -21,7 +30,7 @@ function AuthenticatedShell() {
   return (
     <View className="flex-1">
       <OfflineBanner />
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack screenOptions={{ headerShown: false, ...headerOptions }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="settings" options={{ headerShown: true, title: "Settings" }} />
       </Stack>

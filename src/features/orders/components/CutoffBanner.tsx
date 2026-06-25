@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { Clock, Lock } from "lucide-react-native";
 import { Txt } from "@/components/ui/Text";
 import { cn } from "@/lib/cn";
+import { colors } from "@/lib/theme";
 import { formatCountdown, formatTime } from "@/lib/format";
 import { WindowStatus } from "../schemas";
 
@@ -24,16 +25,32 @@ export function CutoffBanner({ cutoffAt, status }: CutoffBannerProps) {
   return (
     <View
       className={cn(
-        "flex-row items-center gap-2 rounded-xl px-4 py-3",
-        open ? "bg-success/10" : "bg-danger/10",
+        "flex-row items-center gap-3 rounded-2xl border px-4 py-3",
+        open ? "border-success/20 bg-success-soft" : "border-danger/20 bg-danger-soft",
       )}
     >
-      {open ? <Clock size={18} color="#2E7D32" /> : <Lock size={18} color="#C62828" />}
-      <Txt variant="label" className={open ? "text-success" : "text-danger"}>
-        {open
-          ? `${formatCountdown(cutoffAt)} · cutoff ${formatTime(cutoffAt)}`
-          : "Order window closed"}
-      </Txt>
+      <View
+        className={cn(
+          "h-9 w-9 items-center justify-center rounded-xl",
+          open ? "bg-success/15" : "bg-danger/15",
+        )}
+      >
+        {open ? (
+          <Clock size={18} color={colors.success} strokeWidth={2.25} />
+        ) : (
+          <Lock size={18} color={colors.danger} strokeWidth={2.25} />
+        )}
+      </View>
+      <View className="flex-1">
+        <Txt variant="overline" className={open ? "text-success" : "text-danger"}>
+          {open ? "Order window open" : "Window closed"}
+        </Txt>
+        <Txt variant="label" className={open ? "text-success" : "text-danger"}>
+          {open
+            ? `${formatCountdown(cutoffAt)} · cutoff ${formatTime(cutoffAt)}`
+            : "Cutoff has passed"}
+        </Txt>
+      </View>
     </View>
   );
 }
