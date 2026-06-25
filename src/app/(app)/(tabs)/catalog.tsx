@@ -28,7 +28,7 @@ export default function CatalogScreen() {
     <SafeAreaView edges={["top"]} className="flex-1 bg-surface-muted">
       <View className="gap-0.5 px-4 pb-3 pt-3">
         <Txt variant="overline">Catalog</Txt>
-        <Txt variant="h2">Products</Txt>
+        <Txt variant="h2" accessibilityRole="header">Products</Txt>
       </View>
       <FlatList
         data={products.data}

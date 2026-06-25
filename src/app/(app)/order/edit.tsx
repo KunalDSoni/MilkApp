@@ -103,6 +103,7 @@ export default function CartReviewScreen() {
                       value={line.qty}
                       onChange={(q) => setQty(line.productId, q)}
                       min={0}
+                      label={product?.name ?? line.productId}
                     />
                   </View>
                 );

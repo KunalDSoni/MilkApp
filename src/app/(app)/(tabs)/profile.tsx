@@ -27,7 +27,7 @@ export default function ProfileScreen() {
             <Store size={32} color={colors.white} strokeWidth={2} />
           </View>
           <View className="items-center gap-1">
-            <Txt variant="h3">{user?.shopName ?? "Your shop"}</Txt>
+            <Txt variant="h3" accessibilityRole="header">{user?.shopName ?? "Your shop"}</Txt>
             <Txt variant="muted">{user?.name}</Txt>
           </View>
           <View className="flex-row items-center gap-1.5 rounded-full bg-surface-muted px-3 py-1.5">
@@ -74,6 +74,8 @@ function Row({
 }) {
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
       onPress={onPress}
       className="flex-row items-center gap-3 px-4 py-4 active:bg-surface-muted"
     >

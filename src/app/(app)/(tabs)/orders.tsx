@@ -31,7 +31,7 @@ export default function OrdersScreen() {
     <SafeAreaView edges={["top"]} className="flex-1 bg-surface-muted">
       <View className="gap-0.5 px-4 pb-3 pt-3">
         <Txt variant="overline">History</Txt>
-        <Txt variant="h2">Your orders</Txt>
+        <Txt variant="h2" accessibilityRole="header">Your orders</Txt>
       </View>
       {showPlaced ? (
         <View className="px-4 pb-1">
@@ -59,6 +59,9 @@ export default function OrdersScreen() {
         renderItem={({ item, index }) => (
           <AnimatedItem index={index}>
             <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={`Order for ${formatDate(item.deliveryDate)}, ${item.status.toLowerCase()}, ${item.items.length} items, total ${formatCurrency(item.total)}`}
+              accessibilityHint="Opens order details"
               onPress={() =>
                 router.push({ pathname: "/(app)/order/[id]", params: { id: item.id } })
               }

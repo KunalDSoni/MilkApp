@@ -33,10 +33,15 @@ export default function NotificationsScreen() {
       <View className="flex-row items-end justify-between px-4 pb-3 pt-3">
         <View className="gap-0.5">
           <Txt variant="overline">Notifications</Txt>
-          <Txt variant="h2">Alerts</Txt>
+          <Txt variant="h2" accessibilityRole="header">Alerts</Txt>
         </View>
         {unread > 0 ? (
-          <Pressable onPress={() => markAllRead.mutate()} className="py-1 active:opacity-70">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={`Mark all ${unread} notifications as read`}
+            onPress={() => markAllRead.mutate()}
+            className="py-1 active:opacity-70"
+          >
             <Txt variant="label" className="text-accent">
               Mark all read
             </Txt>

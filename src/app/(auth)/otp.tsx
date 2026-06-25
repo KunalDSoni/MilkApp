@@ -68,7 +68,7 @@ export default function OtpScreen() {
   return (
     <ScreenContainer scroll className="gap-8 bg-surface-muted">
       <View className="gap-3 pt-14">
-        <Txt variant="h1">Verify number</Txt>
+        <Txt variant="h1" accessibilityRole="header">Verify number</Txt>
         <Txt variant="bodyLg" className="text-ink-muted">
           Enter the 6-digit code sent to{"\n"}
           <Txt variant="bodyLg" className="text-ink" style={{ fontFamily: "Inter_600SemiBold" }}>
@@ -85,7 +85,11 @@ export default function OtpScreen() {
       </View>
 
       {/* Hidden input drives visible boxes for minimal-typing UX. */}
-      <Pressable onPress={() => inputRef.current?.focus()}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Enter the 6-digit verification code"
+        onPress={() => inputRef.current?.focus()}
+      >
         <View className="flex-row justify-between gap-2">
           {Array.from({ length: OTP_LENGTH }).map((_, i) => {
             const active = otp.length === i;
@@ -135,7 +139,14 @@ export default function OtpScreen() {
         disabled={otp.length !== OTP_LENGTH}
       />
 
-      <Pressable onPress={onResend} disabled={secondsLeft > 0} className="py-1">
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={secondsLeft > 0 ? `Resend code available in ${secondsLeft} seconds` : "Resend code"}
+        accessibilityState={{ disabled: secondsLeft > 0 }}
+        onPress={onResend}
+        disabled={secondsLeft > 0}
+        className="py-1"
+      >
         <Txt
           variant="label"
           className={cn("text-center", secondsLeft > 0 ? "text-ink-subtle" : "text-accent")}

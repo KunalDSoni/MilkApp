@@ -23,7 +23,9 @@ export default function HomeScreen() {
         <View className="flex-row items-center justify-between">
           <View className="gap-1">
             <Txt variant="overline">Welcome back</Txt>
-            <Txt variant="h2">{user?.shopName ?? user?.name ?? "Retailer"}</Txt>
+            <Txt variant="h2" accessibilityRole="header">
+              {user?.shopName ?? user?.name ?? "Retailer"}
+            </Txt>
           </View>
           <View className="h-12 w-12 items-center justify-center rounded-2xl bg-primary">
             <Txt variant="title" className="text-white">
@@ -58,6 +60,8 @@ export default function HomeScreen() {
             </Txt>
           </View>
           <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={itemCount > 0 ? "Review cart and submit order" : "Browse products"}
             onPress={() =>
               router.push(itemCount > 0 ? "/(app)/order/edit" : "/(app)/(tabs)/catalog")
             }
@@ -111,7 +115,12 @@ function QuickAction({
   onPress: () => void;
 }) {
   return (
-    <Pressable onPress={onPress} className="active:opacity-80">
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`${title}. ${subtitle}`}
+      onPress={onPress}
+      className="active:opacity-80"
+    >
       <Card className="gap-3" variant="elevated">
         <View className="h-10 w-10 items-center justify-center rounded-2xl bg-accent-soft">
           {icon}

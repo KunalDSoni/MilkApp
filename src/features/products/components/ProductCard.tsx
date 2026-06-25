@@ -38,6 +38,7 @@ export function ProductCard({ product, quantity, onChange, disabled }: ProductCa
           onChange={onChange}
           min={0}
           disabled={disabled || unavailable}
+          label={product.name}
         />
       </View>
     </Card>
