@@ -5,8 +5,8 @@
  *   GET  /orders               (retailer-scoped, ≤100, newest first)
  *   GET  /orders/:id
  * Decimal strings from the API are parsed to numbers here so the UI never deals
- * with string money. The current order window has no real endpoint yet (see
- * docs/BACKEND_ALIGNMENT.md §1); mock mode supplies one.
+ * with string money. The current order window comes from
+ * GET /orders/windows/current; mock mode supplies one.
  */
 import { z } from "zod";
 import { apiClient } from "@/core/api/client";
@@ -17,6 +17,7 @@ import {
   OrderWindow,
   orderSchema,
   orderStatusSchema,
+  orderWindowSchema,
 } from "./schemas";
 import {
   createMockOrder,
@@ -65,18 +66,29 @@ function toOrder(raw: z.infer<typeof rawOrder>): Order {
   });
 }
 
-/** No real endpoint yet — mock supplies a window; real mode signals the gap. */
+/** Returns the retailer's open order window, or throws WINDOW_UNAVAILABLE (404). */
 export async function fetchCurrentWindow(): Promise<OrderWindow> {
   if (env.useMocks) {
     await delay(200);
     return currentWindow;
   }
-  // TODO(backend): replace with GET /orders/windows/current once it exists.
-  const err = new Error(
-    "Ordering window endpoint is not available on the backend yet.",
-  );
-  (err as { code?: string }).code = "WINDOW_UNAVAILABLE";
-  throw err;
+  try {
+    const { data } = await apiClient.get("/orders/windows/current");
+    return orderWindowSchema.parse({
+      id: data.id,
+      deliveryDate: data.deliveryDate,
+      cutoffAt: data.cutoffAt,
+      status: data.status,
+    });
+  } catch (e) {
+    const status = (e as { response?: { status?: number } }).response?.status;
+    if (status === 404) {
+      const err = new Error("No order window is open right now.");
+      (err as { code?: string }).code = "WINDOW_UNAVAILABLE";
+      throw err;
+    }
+    throw e;
+  }
 }
 
 export async function createOrder(
