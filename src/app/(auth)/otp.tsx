@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Keyboard, Pressable, TextInput, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ScreenContainer } from "@/components/ScreenContainer";
+import { BackButton } from "@/components/BackButton";
 import { Txt } from "@/components/ui/Text";
 import { Button } from "@/components/ui/Button";
 import { otpSchema } from "@/features/auth/schemas";
@@ -66,8 +67,11 @@ export default function OtpScreen() {
   };
 
   return (
-    <ScreenContainer scroll className="gap-8 bg-surface-muted">
-      <View className="gap-3 pt-14">
+    <ScreenContainer scroll className="gap-6 bg-surface-muted">
+      <View className="pt-2">
+        <BackButton />
+      </View>
+      <View className="gap-3">
         <Txt variant="h1" accessibilityRole="header">Verify number</Txt>
         <Txt variant="bodyLg" className="text-ink-muted">
           Enter the 6-digit code sent to{"\n"}
