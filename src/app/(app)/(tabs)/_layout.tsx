@@ -1,11 +1,9 @@
 import { Tabs } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Bell, Home, Package, Receipt, User } from "lucide-react-native";
-import { useUnreadCount } from "@/features/notifications/hooks";
+import { Home, Package, Receipt, Users, User } from "lucide-react-native";
 import { colors } from "@/lib/theme";
 
 export default function TabsLayout() {
-  const unread = useUnreadCount();
   const insets = useSafeAreaInsets();
   // Fixed vertical room for the icon + label so the label is never clipped,
   // plus a bottom cushion that respects the device safe-area inset.
@@ -43,18 +41,15 @@ export default function TabsLayout() {
         options={{ title: "Orders", tabBarIcon: ({ color, focused }) => <Receipt color={color} size={23} strokeWidth={focused ? 2.4 : 2} /> }}
       />
       <Tabs.Screen
-        name="notifications"
-        options={{
-          title: "Alerts",
-          tabBarBadge: unread > 0 ? unread : undefined,
-          tabBarBadgeStyle: { backgroundColor: colors.danger, fontSize: 10, fontFamily: "Inter_700Bold" },
-          tabBarIcon: ({ color, focused }) => <Bell color={color} size={23} strokeWidth={focused ? 2.4 : 2} />,
-        }}
+        name="customers"
+        options={{ title: "Customers", tabBarIcon: ({ color, focused }) => <Users color={color} size={23} strokeWidth={focused ? 2.4 : 2} /> }}
       />
       <Tabs.Screen
         name="profile"
         options={{ title: "Profile", tabBarIcon: ({ color, focused }) => <User color={color} size={23} strokeWidth={focused ? 2.4 : 2} /> }}
       />
+      {/* Notifications route kept, but removed from the tab bar (no backend yet). */}
+      <Tabs.Screen name="notifications" options={{ href: null }} />
     </Tabs>
   );
 }

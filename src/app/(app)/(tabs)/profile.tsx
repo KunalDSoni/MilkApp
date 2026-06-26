@@ -1,17 +1,28 @@
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
-import { ChevronRight, LogOut, Phone, Settings, Store } from "lucide-react-native";
+import {
+  ChevronRight,
+  LogOut,
+  MapPin,
+  Phone,
+  Settings,
+  Store,
+  UserCog,
+} from "lucide-react-native";
 import { ScreenContainer } from "@/components/ScreenContainer";
 import { Card } from "@/components/ui/Card";
 import { Txt } from "@/components/ui/Text";
 import { AnimatedItem } from "@/components/AnimatedItem";
 import { useAuth } from "@/core/auth/useAuth";
+import { useProfile } from "@/features/profile/hooks";
 import { confirmDialog } from "@/lib/dialog";
 import { colors } from "@/lib/theme";
 
 export default function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
   const router = useRouter();
+  const profile = useProfile();
+  const p = profile.data;
 
   const confirmLogout = () => {
     confirmDialog(
@@ -30,22 +41,44 @@ export default function ProfileScreen() {
             <Store size={32} color={colors.white} strokeWidth={2} />
           </View>
           <View className="items-center gap-1">
-            <Txt variant="h3" accessibilityRole="header">{user?.shopName ?? "Your shop"}</Txt>
-            <Txt variant="muted">{user?.name}</Txt>
+            <Txt variant="h3" accessibilityRole="header">
+              {p?.businessName ?? "Your business"}
+            </Txt>
+            {p?.contactName ? <Txt variant="muted">{p.contactName}</Txt> : null}
           </View>
-          <View className="flex-row items-center gap-1.5 rounded-full bg-surface-muted px-3 py-1.5">
-            <Phone size={14} color={colors.textSecondary} />
-            <Txt variant="caption" className="text-ink-muted">+91 {user?.phone}</Txt>
-          </View>
+          {p?.phone ? (
+            <View className="flex-row items-center gap-1.5 rounded-full bg-surface-muted px-3 py-1.5">
+              <Phone size={14} color={colors.textSecondary} />
+              <Txt variant="caption" className="text-ink-muted">
+                {p.phone}
+              </Txt>
+            </View>
+          ) : null}
+          {p?.address ? (
+            <View className="flex-row items-center justify-center gap-1.5 px-4">
+              <MapPin size={14} color={colors.textSecondary} />
+              <Txt variant="caption" className="text-center text-ink-muted">
+                {p.address}
+              </Txt>
+            </View>
+          ) : null}
         </Card>
       </AnimatedItem>
 
       <AnimatedItem index={1}>
-        <Txt variant="overline" className="mt-1">Account</Txt>
+        <Txt variant="overline" className="mt-1">
+          Account
+        </Txt>
       </AnimatedItem>
 
       <AnimatedItem index={2}>
         <Card variant="elevated" className="p-0 overflow-hidden">
+          <Row
+            icon={<UserCog size={20} color={colors.accent} strokeWidth={2.1} />}
+            label="Edit profile"
+            onPress={() => router.push("/(app)/profile/edit")}
+          />
+          <View className="h-px bg-border" />
           <Row
             icon={<Settings size={20} color={colors.accent} strokeWidth={2.1} />}
             label="Settings"
