@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Alert, Pressable, ScrollView, Switch, View } from "react-native";
+import { Pressable, ScrollView, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Trash2 } from "lucide-react-native";
@@ -24,6 +24,7 @@ import { FULL_WEEK_MASK, WEEKDAYS, maskHasDay, toggleMaskDay } from "@/lib/const
 import { cn } from "@/lib/cn";
 import { colors } from "@/lib/theme";
 import { normalizeError } from "@/core/api/errors";
+import { alertDialog, confirmDialog } from "@/lib/dialog";
 
 export default function StandingEditScreen() {
   const router = useRouter();
@@ -65,24 +66,22 @@ export default function StandingEditScreen() {
     const mutation = id ? updateMut : createMut;
     mutation.mutate(values, {
       onSuccess: () => router.back(),
-      onError: (err) => Alert.alert("Error", normalizeError(err).message),
+      onError: (err) => alertDialog("Error", normalizeError(err).message),
     });
   };
 
   const onDelete = () => {
     if (!id) return;
-    Alert.alert("Delete standing order", "This cannot be undone.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () =>
-          deleteMut.mutate(id, {
-            onSuccess: () => router.back(),
-            onError: (err) => Alert.alert("Error", normalizeError(err).message),
-          }),
-      },
-    ]);
+    confirmDialog(
+      "Delete standing order",
+      "This cannot be undone.",
+      () =>
+        deleteMut.mutate(id, {
+          onSuccess: () => router.back(),
+          onError: (err) => alertDialog("Error", normalizeError(err).message),
+        }),
+      "Delete",
+    );
   };
 
   if (products.isLoading) return <LoadingState />;

@@ -1,4 +1,4 @@
-import { Alert, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
 import { ChevronRight, LogOut, Phone, Settings, Store } from "lucide-react-native";
 import { ScreenContainer } from "@/components/ScreenContainer";
@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { Txt } from "@/components/ui/Text";
 import { AnimatedItem } from "@/components/AnimatedItem";
 import { useAuth } from "@/core/auth/useAuth";
+import { confirmDialog } from "@/lib/dialog";
 import { colors } from "@/lib/theme";
 
 export default function ProfileScreen() {
@@ -13,10 +14,12 @@ export default function ProfileScreen() {
   const router = useRouter();
 
   const confirmLogout = () => {
-    Alert.alert("Log out", "Are you sure you want to log out?", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Log out", style: "destructive", onPress: () => void signOut() },
-    ]);
+    confirmDialog(
+      "Log out",
+      "Are you sure you want to log out?",
+      () => void signOut(),
+      "Log out",
+    );
   };
 
   return (

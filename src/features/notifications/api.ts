@@ -10,6 +10,18 @@ import {
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const PAGE_SIZE = 10;
 
+const EMPTY_LIST: NotificationList = { items: [], nextPage: null, unreadCount: 0 };
+
+/**
+ * The notifications backend isn't implemented yet (Slice 2). When the endpoint
+ * is missing the API replies 404 — treat that as "no notifications" rather than
+ * surfacing an error. Once the backend ships the module, these calls just work.
+ */
+function isEndpointMissing(error: unknown): boolean {
+  const status = (error as { response?: { status?: number } })?.response?.status;
+  return status === 404 || status === 501;
+}
+
 export async function fetchNotifications(page: number): Promise<NotificationList> {
   if (env.useMocks) {
     await delay(250);
@@ -19,8 +31,13 @@ export async function fetchNotifications(page: number): Promise<NotificationList
     const unreadCount = mockNotifications.filter((n) => !n.read).length;
     return notificationListSchema.parse({ items, nextPage, unreadCount });
   }
-  const { data } = await apiClient.get("/notifications", { params: { page } });
-  return notificationListSchema.parse(data);
+  try {
+    const { data } = await apiClient.get("/notifications", { params: { page } });
+    return notificationListSchema.parse(data);
+  } catch (error) {
+    if (isEndpointMissing(error)) return EMPTY_LIST;
+    throw error;
+  }
 }
 
 export async function markNotificationRead(id: string): Promise<void> {
@@ -28,7 +45,11 @@ export async function markNotificationRead(id: string): Promise<void> {
     mockMarkRead(id);
     return;
   }
-  await apiClient.post(`/notifications/${id}/read`);
+  try {
+    await apiClient.post(`/notifications/${id}/read`);
+  } catch (error) {
+    if (!isEndpointMissing(error)) throw error;
+  }
 }
 
 export async function markAllNotificationsRead(): Promise<void> {
@@ -36,5 +57,9 @@ export async function markAllNotificationsRead(): Promise<void> {
     mockMarkAll();
     return;
   }
-  await apiClient.post("/notifications/read-all");
+  try {
+    await apiClient.post("/notifications/read-all");
+  } catch (error) {
+    if (!isEndpointMissing(error)) throw error;
+  }
 }
