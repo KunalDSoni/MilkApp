@@ -1,7 +1,10 @@
+import { useMemo } from "react";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useOrder } from "@/features/orders/hooks";
+import { useProducts } from "@/features/products/hooks";
+import { Product } from "@/features/products/schemas";
 import { OrderLineRow } from "@/features/orders/components/OrderLineRow";
 import { OrderSummaryCard } from "@/features/orders/components/OrderSummaryCard";
 import { Card } from "@/components/ui/Card";
@@ -14,6 +17,14 @@ import { formatDate } from "@/lib/format";
 export default function OrderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const order = useOrder(id);
+  const products = useProducts();
+
+  // Order items carry only productId; join with the catalog for names/units.
+  const productById = useMemo(() => {
+    const map = new Map<string, Product>();
+    for (const p of products.data ?? []) map.set(p.id, p);
+    return map;
+  }, [products.data]);
 
   return (
     <SafeAreaView edges={["bottom"]} className="flex-1 bg-surface-muted">
@@ -33,7 +44,10 @@ export default function OrderDetailScreen() {
               Items · {order.data.items.length}
             </Txt>
             {order.data.items.map((line) => (
-              <OrderLineRow key={line.productId} line={line} />
+              <OrderLineRow
+                key={line.productId}
+                line={{ ...line, product: productById.get(line.productId) }}
+              />
             ))}
           </Card>
           <OrderSummaryCard order={order.data} />
