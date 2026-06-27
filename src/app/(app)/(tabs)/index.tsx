@@ -1,6 +1,13 @@
 import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
-import { ArrowRight, Package, Repeat, ShoppingCart } from "lucide-react-native";
+import {
+  ArrowRight,
+  ClipboardList,
+  Package,
+  Repeat,
+  ShoppingCart,
+  Users,
+} from "lucide-react-native";
 import { ScreenContainer } from "@/components/ScreenContainer";
 import { Card } from "@/components/ui/Card";
 import { Txt } from "@/components/ui/Text";
@@ -96,6 +103,25 @@ export default function HomeScreen() {
             title="Products"
             subtitle="Browse catalog"
             onPress={() => router.push("/(app)/(tabs)/catalog")}
+          />
+        </AnimatedItem>
+      </View>
+
+      <View className="flex-row gap-3">
+        <AnimatedItem index={6} className="flex-1">
+          <QuickAction
+            icon={<ClipboardList size={20} color={colors.accent} strokeWidth={2.25} />}
+            title="Sales visit"
+            subtitle="Book a beat order"
+            onPress={() => router.push("/(app)/sales-visits/new")}
+          />
+        </AnimatedItem>
+        <AnimatedItem index={7} className="flex-1">
+          <QuickAction
+            icon={<Users size={20} color={colors.accent} strokeWidth={2.25} />}
+            title="Customers"
+            subtitle="Your outlets"
+            onPress={() => router.push("/(app)/(tabs)/customers")}
           />
         </AnimatedItem>
       </View>
