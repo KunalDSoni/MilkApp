@@ -12,7 +12,9 @@ export type StandingLine = z.infer<typeof standingLineSchema>;
 
 export const standingOrderSchema = z.object({
   id: z.string(),
-  name: z.string().optional(),
+  name: z.string().nullable().optional(),
+  retailerId: z.string().optional(),
+  retailer: z.string().optional(),
   weekdayMask: z.number().int().min(0).max(127),
   active: z.boolean(),
   items: z.array(standingLineSchema).min(1),
@@ -22,6 +24,7 @@ export type StandingOrder = z.infer<typeof standingOrderSchema>;
 export const standingListSchema = z.array(standingOrderSchema);
 
 export const standingFormSchema = z.object({
+  retailerId: z.string().min(1, "Select an outlet"),
   name: z.string().optional(),
   weekdayMask: z.number().int().min(1, "Select at least one day").max(127),
   active: z.boolean(),
