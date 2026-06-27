@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createCustomer, fetchCustomers } from "./api";
+import { createCustomer, fetchCustomers, fetchSalesTeam } from "./api";
 import { CustomerForm } from "./schemas";
 
 export const customerKeys = {
   all: ["customers"] as const,
+  salesTeam: ["customers", "sales-team"] as const,
 };
 
 export function useCustomers() {
@@ -11,6 +12,14 @@ export function useCustomers() {
     queryKey: customerKeys.all,
     queryFn: fetchCustomers,
     staleTime: 30_000,
+  });
+}
+
+export function useSalesTeam() {
+  return useQuery({
+    queryKey: customerKeys.salesTeam,
+    queryFn: fetchSalesTeam,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
