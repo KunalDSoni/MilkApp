@@ -6,6 +6,7 @@ import { Trash2 } from "lucide-react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useProducts } from "@/features/products/hooks";
+import { useCustomers } from "@/features/customers/hooks";
 import {
   useCreateStandingOrder,
   useDeleteStandingOrder,
@@ -30,6 +31,7 @@ export default function StandingEditScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const products = useProducts();
+  const customers = useCustomers();
   const standing = useStandingOrders();
   const existing = useMemo(
     () => standing.data?.find((s) => s.id === id),
@@ -43,6 +45,7 @@ export default function StandingEditScreen() {
   const { control, handleSubmit, watch, setValue, formState } = useForm<StandingForm>({
     resolver: zodResolver(standingFormSchema),
     defaultValues: {
+      retailerId: existing?.retailerId ?? "",
       name: existing?.name ?? "",
       weekdayMask: existing?.weekdayMask ?? FULL_WEEK_MASK,
       active: existing?.active ?? true,
@@ -94,6 +97,43 @@ export default function StandingEditScreen() {
       />
       <ScrollView contentContainerClassName="p-4 gap-4">
         <Card className="gap-4">
+          <Controller
+            control={control}
+            name="retailerId"
+            render={({ field: { onChange, value } }) => (
+              <View className="gap-1.5">
+                <Txt variant="overline">Outlet</Txt>
+                <View className="flex-row flex-wrap gap-2">
+                  {(customers.data ?? []).map((c) => {
+                    const active = value === c.id;
+                    return (
+                      <Pressable
+                        key={c.id}
+                        onPress={() => onChange(c.id)}
+                        className={cn(
+                          "rounded-full border px-3.5 py-2",
+                          active ? "border-accent bg-accent-soft" : "border-border bg-card",
+                        )}
+                      >
+                        <Txt
+                          variant="caption"
+                          className={active ? "text-accent" : "text-ink-muted"}
+                        >
+                          {c.outletName}
+                        </Txt>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+                {formState.errors.retailerId ? (
+                  <Txt variant="caption" className="text-danger">
+                    {formState.errors.retailerId.message}
+                  </Txt>
+                ) : null}
+              </View>
+            )}
+          />
+
           <Controller
             control={control}
             name="name"
