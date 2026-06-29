@@ -8,13 +8,13 @@ import {
   customerSchema,
   salesRepListSchema,
 } from "./schemas";
+import {
+  addMockCustomer,
+  customers as mockCustomers,
+  salesTeam as mockSalesTeam,
+} from "@/features/_mocks/db";
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const mockCustomers: Customer[] = [];
-const mockSalesTeam: SalesRep[] = [
-  { id: "rep_1", name: "Amit Verma", phone: "+919000000010" },
-  { id: "rep_2", name: "Priya Nair", phone: "+919000000011" },
-];
 
 export async function fetchCustomers(): Promise<Customer[]> {
   if (env.useMocks) {
@@ -62,7 +62,7 @@ export async function createCustomer(input: CustomerForm): Promise<Customer> {
         mockSalesTeam.find((r) => r.id === payload.salesOfficerId)?.name ?? null,
       createdAt: new Date().toISOString(),
     };
-    mockCustomers.unshift(created);
+    addMockCustomer(created);
     return created;
   }
   const { data } = await apiClient.post("/customers", payload);
