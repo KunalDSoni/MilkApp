@@ -26,6 +26,7 @@ export const userSchema = z.object({
   id: z.string(),
   name: z.string(),
   phone: z.string(),
+  role: z.string().nullable().optional(),
   shopName: z.string().nullable().optional(),
   distributorId: z.string().nullable().optional(),
 });

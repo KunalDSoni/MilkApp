@@ -45,8 +45,9 @@ export async function verifyOtp(phone: string, code: string): Promise<VerifyResu
       refreshToken: "mock-refresh-token",
       user: {
         id: "ret_1",
-        name: "Demo Retailer",
+        name: "Demo Distributor",
         phone,
+        role: "DISTRIBUTOR",
         shopName: "Demo Dairy Mart",
         distributorId: "dist_1",
       },
