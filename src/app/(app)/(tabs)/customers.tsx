@@ -1,6 +1,6 @@
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { useRouter } from "expo-router";
-import { MapPin, Phone, Store } from "lucide-react-native";
+import { ChevronRight, MapPin, Phone, Store } from "lucide-react-native";
 import { ScreenContainer } from "@/components/ScreenContainer";
 import { Card } from "@/components/ui/Card";
 import { Txt } from "@/components/ui/Text";
@@ -46,29 +46,37 @@ export default function CustomersScreen() {
         <>
           {customers.data.map((c, i) => (
             <AnimatedItem key={c.id} index={i}>
-              <Card className="gap-2">
-                <View className="flex-row items-center gap-2">
-                  <Store size={18} color={colors.accent} strokeWidth={2.2} />
-                  <Txt variant="label" className="flex-1">
-                    {c.outletName}
-                  </Txt>
-                </View>
-                {c.address ? (
-                  <View className="flex-row items-start gap-2">
-                    <MapPin size={14} color={colors.textSecondary} />
-                    <Txt variant="caption" className="flex-1 text-ink-muted">
-                      {c.address}
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Open ${c.outletName}`}
+                onPress={() => router.push(`/(app)/customers/${c.id}`)}
+                className="active:opacity-80"
+              >
+                <Card className="gap-2">
+                  <View className="flex-row items-center gap-2">
+                    <Store size={18} color={colors.accent} strokeWidth={2.2} />
+                    <Txt variant="label" className="flex-1">
+                      {c.outletName}
+                    </Txt>
+                    <ChevronRight size={18} color={colors.textSubtle} strokeWidth={2.2} />
+                  </View>
+                  {c.address ? (
+                    <View className="flex-row items-start gap-2">
+                      <MapPin size={14} color={colors.textSecondary} />
+                      <Txt variant="caption" className="flex-1 text-ink-muted">
+                        {c.address}
+                      </Txt>
+                    </View>
+                  ) : null}
+                  <View className="flex-row items-center gap-2">
+                    <Phone size={14} color={colors.textSecondary} />
+                    <Txt variant="caption" className="text-ink-muted">
+                      {c.phone}
+                      {c.route ? ` · ${c.route}` : ""}
                     </Txt>
                   </View>
-                ) : null}
-                <View className="flex-row items-center gap-2">
-                  <Phone size={14} color={colors.textSecondary} />
-                  <Txt variant="caption" className="text-ink-muted">
-                    {c.phone}
-                    {c.route ? ` · ${c.route}` : ""}
-                  </Txt>
-                </View>
-              </Card>
+                </Card>
+              </Pressable>
             </AnimatedItem>
           ))}
           <Button label="＋ Add customer" onPress={goAdd} />
