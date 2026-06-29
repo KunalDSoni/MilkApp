@@ -39,6 +39,7 @@ export function userFromToken(accessToken: string, phone: string): User {
     id: claims?.retailerId ?? claims?.sub ?? "unknown",
     name: claims?.name ?? "Retailer",
     phone: claims?.phone ?? phone,
+    role: claims?.role ?? null,
     shopName: null,
     distributorId: claims?.distributorId ?? null,
   };
