@@ -2,22 +2,26 @@ import { useMemo } from "react";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useOrder } from "@/features/orders/hooks";
+import { RotateCcw } from "lucide-react-native";
+import { useOrder, useReorder } from "@/features/orders/hooks";
 import { useProducts } from "@/features/products/hooks";
 import { Product } from "@/features/products/schemas";
 import { OrderLineRow } from "@/features/orders/components/OrderLineRow";
 import { OrderSummaryCard } from "@/features/orders/components/OrderSummaryCard";
 import { Card } from "@/components/ui/Card";
 import { Txt } from "@/components/ui/Text";
+import { Button } from "@/components/ui/Button";
 import { LoadingState } from "@/components/LoadingState";
 import { ErrorState } from "@/components/ErrorState";
 import { normalizeError } from "@/core/api/errors";
 import { formatDate } from "@/lib/format";
+import { colors } from "@/lib/theme";
 
 export default function OrderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const order = useOrder(id);
   const products = useProducts();
+  const reorder = useReorder();
 
   // Order items carry only productId; join with the catalog for names/units.
   const productById = useMemo(() => {
@@ -51,6 +55,11 @@ export default function OrderDetailScreen() {
             ))}
           </Card>
           <OrderSummaryCard order={order.data} />
+          <Button
+            label="Reorder these items"
+            icon={<RotateCcw size={18} color={colors.white} strokeWidth={2.3} />}
+            onPress={() => reorder(order.data!)}
+          />
         </ScrollView>
       )}
     </SafeAreaView>
