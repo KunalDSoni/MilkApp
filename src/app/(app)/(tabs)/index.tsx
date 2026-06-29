@@ -5,6 +5,7 @@ import {
   ChevronRight,
   ClipboardList,
   IndianRupee,
+  MapPin,
   Package,
   Repeat,
   ShoppingCart,
@@ -188,6 +189,26 @@ export default function HomeScreen() {
         <Txt variant="overline" className="mt-1">
           Quick actions
         </Txt>
+      </AnimatedItem>
+
+      <AnimatedItem index={3}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Plan today's beat"
+          onPress={() => router.push("/(app)/beat")}
+          className="active:opacity-90"
+        >
+          <Card className="flex-row items-center gap-3" variant="elevated">
+            <View className="h-11 w-11 items-center justify-center rounded-2xl bg-accent-soft">
+              <MapPin size={20} color={colors.accent} strokeWidth={2.25} />
+            </View>
+            <View className="flex-1 gap-0.5">
+              <Txt variant="label">Today&apos;s Beat</Txt>
+              <Txt variant="caption">Plan your route &amp; check in outlets</Txt>
+            </View>
+            <ChevronRight size={18} color={colors.textSubtle} strokeWidth={2.2} />
+          </Card>
+        </Pressable>
       </AnimatedItem>
 
       <View className="flex-row gap-3">

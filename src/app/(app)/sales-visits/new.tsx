@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/Input";
@@ -55,6 +55,11 @@ function Chip({
 
 export default function NewSalesVisitScreen() {
   const router = useRouter();
+  // Prefilled when arriving from Today's Beat ("Book visit").
+  const { retailerId, route } = useLocalSearchParams<{
+    retailerId?: string;
+    route?: string;
+  }>();
   const salesTeam = useSalesTeam();
   const customers = useCustomers();
   const products = useProducts();
@@ -74,8 +79,8 @@ export default function NewSalesVisitScreen() {
     defaultValues: {
       date: today(),
       salesOfficerId: "",
-      retailerId: "",
-      routeName: "",
+      retailerId: retailerId ?? "",
+      routeName: route ?? "",
       outletType: "EXISTING",
       dayStartAt: "",
       inTime: "",

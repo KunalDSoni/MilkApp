@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import {
   createOrder,
   fetchCurrentWindow,
@@ -7,6 +8,8 @@ import {
   submitOrder,
 } from "./api";
 import { CartLine, Order } from "./schemas";
+import { useCart } from "@/features/cart/store";
+import { confirmDialog } from "@/lib/dialog";
 
 export const orderKeys = {
   window: ["order", "window"] as const,
@@ -59,4 +62,36 @@ export function usePlaceOrder() {
       qc.invalidateQueries({ queryKey: orderKeys.list });
     },
   });
+}
+
+/**
+ * Refills the cart from a past order so the rep can reorder in one tap. Only
+ * fills the cart and routes to the cart review — submission still goes through
+ * the live window/cutoff check. Confirms before overwriting a non-empty cart.
+ */
+export function useReorder() {
+  const router = useRouter();
+
+  const fill = (order: Order) => {
+    const { setQty, clear } = useCart.getState();
+    clear();
+    for (const line of order.items) {
+      if (line.qty > 0) setQty(line.productId, line.qty);
+    }
+    router.push("/(app)/order/edit");
+  };
+
+  return (order: Order) => {
+    const hasCart = useCart.getState().itemCount() > 0;
+    if (hasCart) {
+      confirmDialog(
+        "Replace current cart?",
+        "Reordering will replace the items currently in your cart.",
+        () => fill(order),
+        "Replace",
+      );
+      return;
+    }
+    fill(order);
+  };
 }
