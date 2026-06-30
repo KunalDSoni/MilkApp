@@ -8,6 +8,9 @@ import { Product } from "@/features/products/schemas";
 import { Order, OrderLine, OrderWindow } from "@/features/orders/schemas";
 import { StandingOrder } from "@/features/standing/schemas";
 import { AppNotification } from "@/features/notifications/schemas";
+import { Customer, SalesRep } from "@/features/customers/schemas";
+import { LedgerEntry, OutletLedger, PaymentMode } from "@/features/ledger/schemas";
+import { Dashboard } from "@/features/dashboard/schemas";
 
 let seq = 1;
 export function nextId(prefix: string) {
@@ -211,4 +214,185 @@ export function markNotificationRead(nid: string) {
 
 export function markAllRead() {
   notifications.forEach((n) => (n.read = true));
+}
+
+// ── Sales team (GET /sales-team) ───────────────────────────────────────────
+export const salesTeam: SalesRep[] = [
+  { id: "rep_1", name: "Amit Verma", phone: "+919000000010" },
+  { id: "rep_2", name: "Priya Nair", phone: "+919000000011" },
+];
+
+// ── Customers / outlets (GET /customers). The list `id` IS the retailer id
+// the ledger routes (GET /customers/:id/ledger) expect. ────────────────────
+export const customers: Customer[] = [
+  {
+    id: "cust_seed_1",
+    outletName: "Sharma General Store",
+    address: "12 Station Road, Sector 4",
+    route: "Route A",
+    gstin: null,
+    phone: "+919811100001",
+    whatsapp: "+919811100001",
+    paymentTerms: "7 days credit",
+    outletType: "EXISTING",
+    salesOfficer: "Amit Verma",
+    createdAt: new Date(Date.now() - 90 * 86400000).toISOString(),
+  },
+  {
+    id: "cust_seed_2",
+    outletName: "Krishna Dairy & Sweets",
+    address: "Main Market, Near Bus Stand",
+    route: "Route A",
+    gstin: "07AABCK1234M1Z5",
+    phone: "+919811100002",
+    whatsapp: "+919811100002",
+    paymentTerms: "Cash on delivery",
+    outletType: "EXISTING",
+    salesOfficer: "Amit Verma",
+    createdAt: new Date(Date.now() - 60 * 86400000).toISOString(),
+  },
+  {
+    id: "cust_seed_3",
+    outletName: "Gupta Provision",
+    address: "45 Gandhi Nagar",
+    route: "Route B",
+    gstin: null,
+    phone: "+919811100003",
+    whatsapp: null,
+    paymentTerms: "15 days credit",
+    outletType: "EXISTING",
+    salesOfficer: "Priya Nair",
+    createdAt: new Date(Date.now() - 30 * 86400000).toISOString(),
+  },
+  {
+    id: "cust_seed_4",
+    outletName: "Fresh Mart (New)",
+    address: "Shop 8, Green Avenue",
+    route: "Route B",
+    gstin: null,
+    phone: "+919811100004",
+    whatsapp: "+919811100004",
+    paymentTerms: null,
+    outletType: "NEW",
+    salesOfficer: "Priya Nair",
+    createdAt: new Date(Date.now() - 5 * 86400000).toISOString(),
+  },
+];
+
+export function addMockCustomer(c: Customer) {
+  customers.unshift(c);
+  // New outlets start with a clean account.
+  outletLedgers[c.id] = {
+    retailerId: c.id,
+    outletName: c.outletName,
+    balance: 0,
+    creditLimit: 0,
+    entries: [],
+  };
+}
+
+// ── Ledgers (GET /customers/:id/ledger, POST /collections) ─────────────────
+// Build a statement from a chronological list of order debits and payments,
+// computing the running balanceAfter the way the backend ledger does.
+function buildLedger(
+  retailerId: string,
+  outletName: string,
+  creditLimit: number,
+  moves: { type: LedgerEntry["type"]; amount: number; refType: string; note: string; daysAgo: number }[],
+): OutletLedger {
+  let balance = 0;
+  const entries: LedgerEntry[] = moves.map((m, i) => {
+    balance += m.type === "DEBIT" ? m.amount : -m.amount;
+    return {
+      id: `led_${retailerId}_${i}`,
+      type: m.type,
+      amount: m.amount,
+      refType: m.refType,
+      refId: null,
+      balanceAfter: balance,
+      note: m.note,
+      createdAt: new Date(Date.now() - m.daysAgo * 86400000).toISOString(),
+    };
+  });
+  // Newest first, matching the backend ordering.
+  entries.reverse();
+  return { retailerId, outletName, balance, creditLimit, entries };
+}
+
+export const outletLedgers: Record<string, OutletLedger> = {
+  cust_seed_1: buildLedger("cust_seed_1", "Sharma General Store", 15000, [
+    { type: "DEBIT", amount: 4200, refType: "ORDER", note: "Order delivery", daysAgo: 12 },
+    { type: "CREDIT", amount: 4200, refType: "PAYMENT", note: "CASH", daysAgo: 10 },
+    { type: "DEBIT", amount: 5100, refType: "ORDER", note: "Order delivery", daysAgo: 6 },
+    { type: "CREDIT", amount: 2000, refType: "PAYMENT", note: "UPI", daysAgo: 3 },
+    { type: "DEBIT", amount: 3800, refType: "ORDER", note: "Order delivery", daysAgo: 1 },
+  ]), // balance 6900 / 15000 — healthy
+  cust_seed_2: buildLedger("cust_seed_2", "Krishna Dairy & Sweets", 10000, [
+    { type: "DEBIT", amount: 6500, refType: "ORDER", note: "Order delivery", daysAgo: 9 },
+    { type: "DEBIT", amount: 5200, refType: "ORDER", note: "Order delivery", daysAgo: 4 },
+    { type: "CREDIT", amount: 1000, refType: "PAYMENT", note: "CASH", daysAgo: 2 },
+  ]), // balance 10700 / 10000 — OVER LIMIT
+  cust_seed_3: buildLedger("cust_seed_3", "Gupta Provision", 20000, [
+    { type: "DEBIT", amount: 3000, refType: "ORDER", note: "Order delivery", daysAgo: 8 },
+    { type: "CREDIT", amount: 3000, refType: "PAYMENT", note: "CHEQUE", daysAgo: 5 },
+  ]), // balance 0 — clear
+  cust_seed_4: buildLedger("cust_seed_4", "Fresh Mart (New)", 5000, [
+    { type: "DEBIT", amount: 1500, refType: "ORDER", note: "First order", daysAgo: 2 },
+  ]), // balance 1500 / 5000
+};
+
+/** Record a payment (CREDIT) and return the updated statement. */
+export function recordMockCollection(
+  retailerId: string,
+  amount: number,
+  mode: PaymentMode,
+  note?: string,
+): OutletLedger {
+  const ledger = outletLedgers[retailerId];
+  if (!ledger) throw new Error("Outlet not found");
+  const balance = ledger.balance - amount;
+  const entry: LedgerEntry = {
+    id: nextId("led"),
+    type: "CREDIT",
+    amount,
+    refType: "PAYMENT",
+    refId: null,
+    balanceAfter: balance,
+    note: [mode, note].filter(Boolean).join(" · "),
+    createdAt: new Date().toISOString(),
+  };
+  ledger.entries.unshift(entry);
+  ledger.balance = balance;
+  return ledger;
+}
+
+// ── Dashboard (GET /dashboard) — derived live from the seeded data so the KPI
+// strip stays consistent after a payment is recorded. ──────────────────────
+export function buildDashboard(): Dashboard {
+  const ledgerList = Object.values(outletLedgers);
+  const outstanding = ledgerList.reduce((s, l) => s + Math.max(l.balance, 0), 0);
+  const outletsWithDues = ledgerList.filter((l) => l.balance > 0).length;
+
+  // Top SKUs by value across the mock order history.
+  const valueByProduct = new Map<string, { name: string; qty: number; value: number }>();
+  for (const o of orders) {
+    for (const l of o.items) {
+      const name = productById(l.productId)?.name ?? l.productId;
+      const prev = valueByProduct.get(l.productId) ?? { name, qty: 0, value: 0 };
+      prev.qty += l.qty;
+      prev.value += l.unitPrice * l.qty;
+      valueByProduct.set(l.productId, prev);
+    }
+  }
+  const topSkus = [...valueByProduct.entries()]
+    .map(([productId, v]) => ({ productId, ...v }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+
+  return {
+    network: { distributors: 1, outlets: customers.length, salesReps: salesTeam.length },
+    dues: { outstanding, outletsWithDues },
+    visits: { count: 18, newOutlets: 3, withOrder: 11, strikeRatePct: 61 },
+    topSkus,
+  };
 }
