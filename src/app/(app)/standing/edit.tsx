@@ -1,11 +1,12 @@
 import { useMemo } from "react";
-import { Alert, Pressable, ScrollView, Switch, View } from "react-native";
+import { Pressable, ScrollView, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Trash2 } from "lucide-react-native";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useProducts } from "@/features/products/hooks";
+import { useCustomers } from "@/features/customers/hooks";
 import {
   useCreateStandingOrder,
   useDeleteStandingOrder,
@@ -24,11 +25,13 @@ import { FULL_WEEK_MASK, WEEKDAYS, maskHasDay, toggleMaskDay } from "@/lib/const
 import { cn } from "@/lib/cn";
 import { colors } from "@/lib/theme";
 import { normalizeError } from "@/core/api/errors";
+import { alertDialog, confirmDialog } from "@/lib/dialog";
 
 export default function StandingEditScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const products = useProducts();
+  const customers = useCustomers();
   const standing = useStandingOrders();
   const existing = useMemo(
     () => standing.data?.find((s) => s.id === id),
@@ -42,6 +45,7 @@ export default function StandingEditScreen() {
   const { control, handleSubmit, watch, setValue, formState } = useForm<StandingForm>({
     resolver: zodResolver(standingFormSchema),
     defaultValues: {
+      retailerId: existing?.retailerId ?? "",
       name: existing?.name ?? "",
       weekdayMask: existing?.weekdayMask ?? FULL_WEEK_MASK,
       active: existing?.active ?? true,
@@ -65,24 +69,22 @@ export default function StandingEditScreen() {
     const mutation = id ? updateMut : createMut;
     mutation.mutate(values, {
       onSuccess: () => router.back(),
-      onError: (err) => Alert.alert("Error", normalizeError(err).message),
+      onError: (err) => alertDialog("Error", normalizeError(err).message),
     });
   };
 
   const onDelete = () => {
     if (!id) return;
-    Alert.alert("Delete standing order", "This cannot be undone.", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () =>
-          deleteMut.mutate(id, {
-            onSuccess: () => router.back(),
-            onError: (err) => Alert.alert("Error", normalizeError(err).message),
-          }),
-      },
-    ]);
+    confirmDialog(
+      "Delete standing order",
+      "This cannot be undone.",
+      () =>
+        deleteMut.mutate(id, {
+          onSuccess: () => router.back(),
+          onError: (err) => alertDialog("Error", normalizeError(err).message),
+        }),
+      "Delete",
+    );
   };
 
   if (products.isLoading) return <LoadingState />;
@@ -95,6 +97,43 @@ export default function StandingEditScreen() {
       />
       <ScrollView contentContainerClassName="p-4 gap-4">
         <Card className="gap-4">
+          <Controller
+            control={control}
+            name="retailerId"
+            render={({ field: { onChange, value } }) => (
+              <View className="gap-1.5">
+                <Txt variant="overline">Outlet</Txt>
+                <View className="flex-row flex-wrap gap-2">
+                  {(customers.data ?? []).map((c) => {
+                    const active = value === c.id;
+                    return (
+                      <Pressable
+                        key={c.id}
+                        onPress={() => onChange(c.id)}
+                        className={cn(
+                          "rounded-full border px-3.5 py-2",
+                          active ? "border-accent bg-accent-soft" : "border-border bg-card",
+                        )}
+                      >
+                        <Txt
+                          variant="caption"
+                          className={active ? "text-accent" : "text-ink-muted"}
+                        >
+                          {c.outletName}
+                        </Txt>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+                {formState.errors.retailerId ? (
+                  <Txt variant="caption" className="text-danger">
+                    {formState.errors.retailerId.message}
+                  </Txt>
+                ) : null}
+              </View>
+            )}
+          />
+
           <Controller
             control={control}
             name="name"

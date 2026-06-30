@@ -18,7 +18,14 @@ export function StandingOrderCard({ standingOrder, onEdit }: StandingOrderCardPr
   return (
     <Card className="gap-3">
       <View className="flex-row items-center justify-between">
-        <Txt variant="title">{standingOrder.name ?? "Standing order"}</Txt>
+        <View className="flex-1">
+          <Txt variant="title">{standingOrder.name ?? "Standing order"}</Txt>
+          {standingOrder.retailer ? (
+            <Txt variant="caption" className="text-ink-muted">
+              {standingOrder.retailer}
+            </Txt>
+          ) : null}
+        </View>
         <Badge
           label={standingOrder.active ? "Active" : "Paused"}
           tone={standingOrder.active ? "success" : "neutral"}
