@@ -2,15 +2,15 @@
 
 ## Current State
 - **Branch**: `feat/enterprise-testing` (pushed to `origin`)
-- **Last commit**: `aad8a7e` — `feat: add enterprise-grade testing framework for mobile app`
+- **Last commit**: `fedb424` — `docs: add resume instructions for next AI session (testing framework state)`
 - **Working tree**: clean, nothing to commit
 
 ## What Was Completed
 
-### Enterprise Testing Framework (current sprint)
+### Enterprise Testing Framework
 - **Jest configured** with expo preset, 95% coverage thresholds
 - **Test setup** (`jest.setup.ts`): mocks for AsyncStorage, SecureStore, expo-router, NetInfo, expo-notifications
-- **40+ test files** across all layers — all written (need Jest installed to run)
+- **40+ test files** across all layers (need Jest installed to run)
 
 #### Core Tests — `src/__tests__/core/`
 | File | Tests | What it covers |
@@ -79,8 +79,7 @@
 
 ### Setup (needs Jest installed)
 ```bash
-cd /path/to/MilkApp
-npm install --save-dev jest @testing-library/react-native @testing-library/jest-native jest-expo
+npm install --save-dev jest @testing-library/react-native @testing-library/jest-native jest-expo @types/jest
 npx jest --passWithNoTests
 ```
 
