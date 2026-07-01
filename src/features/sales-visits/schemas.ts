@@ -21,3 +21,22 @@ export const salesVisitFormSchema = z.object({
   remarks: z.string().trim().max(500).optional(),
 });
 export type SalesVisitForm = z.infer<typeof salesVisitFormSchema>;
+
+export const salesVisitSchema = z.object({
+  id: z.string(),
+  date: z.string(),
+  salesOfficer: z.string(),
+  retailer: z.string(),
+  route: z.string().nullable(),
+  outletType: z.enum(["NEW", "EXISTING"]),
+  inTime: z.string().nullable(),
+  bookingTime: z.string().nullable(),
+  competition: z.string().nullable(),
+  remarks: z.string().nullable(),
+  itemCount: z.number(),
+  orderId: z.string().nullable(),
+  orderTotal: z.string().nullable(),
+  createdAt: z.string(),
+});
+export type SalesVisit = z.infer<typeof salesVisitSchema>;
+export const salesVisitListSchema = z.array(salesVisitSchema);

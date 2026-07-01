@@ -12,6 +12,7 @@ import {
   Store,
   TrendingUp,
   Users,
+  Wallet,
 } from "lucide-react-native";
 import { ScreenContainer } from "@/components/ScreenContainer";
 import { Card } from "@/components/ui/Card";
@@ -234,9 +235,9 @@ export default function HomeScreen() {
         <AnimatedItem index={6} className="flex-1">
           <QuickAction
             icon={<ClipboardList size={20} color={colors.accent} strokeWidth={2.25} />}
-            title="Sales visit"
-            subtitle="Book a beat order"
-            onPress={() => router.push("/(app)/sales-visits/new")}
+            title="Sales visits"
+            subtitle="History &amp; new visits"
+            onPress={() => router.push("/(app)/sales-visits")}
           />
         </AnimatedItem>
         <AnimatedItem index={7} className="flex-1">
@@ -248,6 +249,15 @@ export default function HomeScreen() {
           />
         </AnimatedItem>
       </View>
+
+      <AnimatedItem index={8}>
+        <QuickAction
+          icon={<Wallet size={20} color={colors.accent} strokeWidth={2.25} />}
+          title="Payments"
+          subtitle="Log &amp; view payments"
+          onPress={() => router.push("/(app)/payments")}
+        />
+      </AnimatedItem>
     </ScreenContainer>
   );
 }

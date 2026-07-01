@@ -74,6 +74,10 @@ function AuthenticatedShell() {
       <Stack screenOptions={{ headerShown: false, ...headerOptions }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="settings" options={{ headerShown: true, title: "Settings" }} />
+        <Stack.Screen name="payments/index" options={{ headerShown: true, title: "Payment Log" }} />
+        <Stack.Screen name="payments/new" options={{ headerShown: true, title: "Log Payment" }} />
+        <Stack.Screen name="sales-visits/index" options={{ headerShown: true, title: "Sales Visits" }} />
+        <Stack.Screen name="sales-visits/new" options={{ headerShown: true, title: "New Visit" }} />
       </Stack>
     </View>
   );
