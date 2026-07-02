@@ -101,3 +101,20 @@ export async function logout(): Promise<void> {
     // Best-effort; local session is cleared regardless.
   }
 }
+
+export async function resetPassword(phone: string, code: string, newPassword: string): Promise<void> {
+  if (env.useMocks) {
+    await delay(600);
+    if (code !== MOCK_OTP) {
+      const error = new Error("Invalid code. In mock mode the code is 123456.");
+      (error as { status?: number }).status = 401;
+      throw error;
+    }
+    return;
+  }
+  await apiClient.post("/auth/reset-password", {
+    phone: toE164(phone),
+    code,
+    newPassword,
+  });
+}

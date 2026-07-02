@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { normalizeError } from "@/core/api/errors";
-import { requestOtp, verifyOtp, loginWithPassword } from "./api";
+import { requestOtp, verifyOtp, loginWithPassword, resetPassword } from "./api";
 
 export function useRequestOtp() {
   return useMutation({
@@ -20,5 +20,12 @@ export function useLoginWithPassword() {
   return useMutation({
     mutationFn: ({ phone, password }: { phone: string; password: string }) =>
       loginWithPassword(phone, password),
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: ({ phone, code, newPassword }: { phone: string; code: string; newPassword: string }) =>
+      resetPassword(phone, code, newPassword),
   });
 }

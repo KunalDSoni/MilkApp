@@ -1,7 +1,32 @@
 import { apiClient } from "@/core/api/client";
 import { env } from "@/core/config/env";
 import { PaymentLog, CreatePaymentInput, paymentListSchema, paymentLogSchema } from "./schemas";
-import { orders } from "@/features/_mocks/db";
+
+export interface UploadResult {
+  key: string;
+  url: string;
+}
+
+/**
+ * Upload a proof image. In mock mode returns a fake key immediately.
+ * In live mode sends the file to the NestJS proxy endpoint.
+ */
+export async function uploadProofImage(uri: string, fileName: string, mimeType: string): Promise<UploadResult> {
+  if (env.useMocks) {
+    await delay(400);
+    return { key: `mock_proof_${Date.now()}.jpg`, url: uri };
+  }
+  const formData = new FormData();
+  formData.append("file", {
+    uri,
+    name: fileName,
+    type: mimeType,
+  } as unknown as Blob);
+  const { data } = await apiClient.post("/files/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return { key: data.key, url: data.url };
+}
 
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 

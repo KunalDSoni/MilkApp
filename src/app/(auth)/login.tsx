@@ -122,27 +122,38 @@ export default function LoginScreen() {
           placeholder="10-digit number"
         />
         {mode === "password" ? (
-          <Input
-            label="Password"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-            onSubmitEditing={onSubmit}
-            placeholder="Enter your password"
-            suffix={
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={showPassword ? "Hide password" : "Show password"}
-                onPress={() => setShowPassword((v) => !v)}
-              >
-                {showPassword ? (
-                  <EyeOff size={20} color={colors.textSubtle} strokeWidth={2} />
-                ) : (
-                  <Eye size={20} color={colors.textSubtle} strokeWidth={2} />
-                )}
-              </Pressable>
-            }
-          />
+          <>
+            <Input
+              label="Password"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+              onSubmitEditing={onSubmit}
+              placeholder="Enter your password"
+              suffix={
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+                  onPress={() => setShowPassword((v) => !v)}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} color={colors.textSubtle} strokeWidth={2} />
+                  ) : (
+                    <Eye size={20} color={colors.textSubtle} strokeWidth={2} />
+                  )}
+                </Pressable>
+              }
+            />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Forgot password"
+              onPress={() => router.push("/(auth)/forgot-password")}
+            >
+              <Txt variant="caption" className="text-accent text-right">
+                Forgot password?
+              </Txt>
+            </Pressable>
+          </>
         ) : null}
         <Button
           label={mode === "otp" ? "Send OTP" : "Sign in"}

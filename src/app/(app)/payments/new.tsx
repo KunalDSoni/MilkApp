@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Image, Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { IndianRupee, Banknote, Building2, Smartphone, Receipt } from "lucide-react-native";
+import * as ImagePicker from "expo-image-picker";
+import { IndianRupee, Banknote, Building2, Camera, Smartphone, Receipt, X } from "lucide-react-native";
 import { useCreatePayment } from "@/features/payment/hooks";
+import { uploadProofImage } from "@/features/payment/api";
 import { PaymentMode } from "@/features/payment/schemas";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -27,7 +29,37 @@ export default function NewPaymentScreen() {
   const [amount, setAmount] = useState("");
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().slice(0, 10));
   const [note, setNote] = useState("");
+  const [proofImage, setProofImage] = useState<{ uri: string; key: string } | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      setError("Camera roll permission is required to attach proof images.");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      quality: 0.8,
+    });
+    if (result.canceled) return;
+    const asset = result.assets[0];
+    setUploadingImage(true);
+    try {
+      const uploaded = await uploadProofImage(
+        asset.uri,
+        asset.fileName ?? `proof_${Date.now()}.jpg`,
+        asset.mimeType ?? "image/jpeg",
+      );
+      setProofImage({ uri: uploaded.url, key: uploaded.key });
+    } catch (err) {
+      setError(normalizeError(err).message);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -40,6 +72,7 @@ export default function NewPaymentScreen() {
         amount,
         paymentDate,
         mode,
+        proofImageKey: proofImage?.key,
         note: note.trim() || undefined,
       });
       router.replace("/(app)/payments");
@@ -110,12 +143,46 @@ export default function NewPaymentScreen() {
             onChangeText={setNote}
             multiline
           />
+
+          <View className="gap-2">
+            <Txt variant="label">Proof of transaction</Txt>
+            {proofImage ? (
+              <View className="relative">
+                <Image
+                  source={{ uri: proofImage.uri }}
+                  className="h-32 w-full rounded-xl"
+                  resizeMode="cover"
+                />
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Remove proof image"
+                  onPress={() => setProofImage(null)}
+                  className="absolute right-2 top-2 rounded-full bg-black/50 p-1"
+                >
+                  <X size={16} color={colors.white} strokeWidth={2.5} />
+                </Pressable>
+              </View>
+            ) : (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Attach proof image"
+                onPress={pickImage}
+                disabled={uploadingImage}
+                className="flex-row items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-6"
+              >
+                <Camera size={22} color={colors.textSubtle} strokeWidth={2} />
+                <Txt variant="body" className="text-ink-muted">
+                  {uploadingImage ? "Uploading..." : "Tap to attach photo"}
+                </Txt>
+              </Pressable>
+            )}
+          </View>
         </Card>
 
         <Button
           label={createPayment.isPending ? "Logging..." : "Log Payment"}
           onPress={handleSubmit}
-          disabled={createPayment.isPending}
+          disabled={createPayment.isPending || uploadingImage}
         />
       </ScrollView>
     </SafeAreaView>
