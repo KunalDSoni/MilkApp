@@ -8,11 +8,12 @@ interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
   prefix?: string;
+  suffix?: React.ReactNode;
   className?: string;
 }
 
 export const Input = forwardRef<TextInput, InputProps>(function Input(
-  { label, error, prefix, className, onFocus, onBlur, ...rest },
+  { label, error, prefix, suffix, className, onFocus, onBlur, ...rest },
   ref,
 ) {
   const [focused, setFocused] = useState(false);
@@ -54,6 +55,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
           style={{ fontFamily: "Inter_500Medium", fontSize: 16 }}
           {...rest}
         />
+        {suffix ? <View className="ml-2">{suffix}</View> : null}
       </View>
       {error ? (
         <Txt variant="caption" className="text-danger">

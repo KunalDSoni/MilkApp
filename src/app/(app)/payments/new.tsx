@@ -126,7 +126,7 @@ export default function NewPaymentScreen() {
           <Input
             label="Amount (₹)"
             placeholder="0.00"
-            keyboardType="decimal"
+            keyboardType="decimal-pad"
             value={amount}
             onChangeText={setAmount}
           />
