@@ -9,12 +9,14 @@
 - Added `POST /auth/reset-password` backend endpoint (verifies OTP, sets new password hash, revokes all tokens)
 - Created Forgot Password screen at `src/app/(auth)/forgot-password.tsx`
 - Added "Forgot password?" link on login screen (`src/app/(auth)/login.tsx`)
-- Added `changePassword` / `useChangePassword` to profile API and hooks (`src/features/profile/api.ts`, `src/features/profile/hooks.ts`)
-- Added change password section to profile edit screen (`src/app/(app)/profile/edit.tsx`)
+- Added `resetPassword` / `useResetPassword` to auth API and hooks (`src/features/auth/api.ts`, `src/features/auth/hooks.ts`)
+- Added `suffix` prop to `Input` component (`src/components/ui/Input.tsx`)
+- Fixed keyboard type `"decimal"` → `"decimal-pad"` in `payments/new.tsx`
 
 ### Pending (Epic 5)
 - Push notification FCM token registration endpoint + MilkApp token hook
 - Bulk operations (CSV export, batch status update) in Admin Web
+- Change password section on profile edit screen (`src/app/(app)/profile/edit.tsx`)
 
 ### Setup
 - Branch: `feat/enterprise-testing` (pushed to `origin`)
